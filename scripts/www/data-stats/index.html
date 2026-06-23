@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>观心少年2组 - 数据统计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f0f8 0%, #dfe9f3 30%, #eef3f9 60%, #e3ecf5 100%);
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 80px;
+        }
+
+        /* 背景装饰 */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.08;
+        }
+
+        .bg-circle-1 {
+            width: 300px;
+            height: 300px;
+            background: #4a90d9;
+            top: -100px;
+            right: -80px;
+        }
+
+        .bg-circle-2 {
+            width: 200px;
+            height: 200px;
+            background: #5b9bd5;
+            bottom: 120px;
+            left: -60px;
+        }
+
+        .bg-circle-3 {
+            width: 150px;
+            height: 150px;
+            background: #3a7bc8;
+            top: 40%;
+            right: -40px;
+        }
+
+        /* 主容器 */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            padding: 20px 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 顶部标题区 */
+        .header-section {
+            text-align: center;
+            padding: 20px 0 10px;
+        }
+
+        .header-section h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #000;
+            letter-spacing: 4px;
+            margin: 0 0 4px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.08);
+        }
+
+        .header-section .subtitle {
+            font-size: 0.85em;
+            color: #999;
+            letter-spacing: 2px;
+            margin-top: 6px;
+        }
+
+        /* 仪表盘 */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 24px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .card:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .card .card-label {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .card-value {
+            font-size: 2.4em;
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0;
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+            z-index: 100;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 6px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #999;
+            font-size: 0.7em;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .nav-tab .nav-icon {
+            font-size: 1.4em;
+            line-height: 1;
+        }
+
+        .nav-tab.active {
+            color: #5b9bd5;
+            background: rgba(91, 155, 213, 0.08);
+        }
+
+        .nav-tab:active {
+            transform: scale(0.92);
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        @media (max-width: 360px) {
+            .header-section h1 {
+                font-size: 1.5em;
+                letter-spacing: 2px;
+            }
+            .card {
+                padding: 20px 16px;
+            }
+            .card .card-label {
+                font-size: 0.9em;
+            }
+            .card-value {
+                font-size: 2em;
+            }
+        }
+
+        @media (min-width: 420px) {
+            .card-value {
+                font-size: 2.8em;
+            }
+        }
+
+        /* ===== 主题切换开关 ===== */
+        .theme-switch-wrapper {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+        }
+        .switch {
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            width: 3.2em;
+            height: 1.8em;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #f4f4f5;
+            transition: .4s;
+            border-radius: 30px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 1.3em;
+            width: 1.3em;
+            border-radius: 20px;
+            left: 0.25em;
+            bottom: 0.25em;
+            background: linear-gradient(40deg,#ff0080,#ff8c00 70%);
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: #303136;
+        }
+        input:checked + .slider:before {
+            transform: translateX(1.4em);
+            background: #303136;
+            box-shadow: inset -3px -2px 5px -2px #8983f7, inset -10px -5px 0 0 #a3dafb;
+        }
+
+        /* ===== 深色主题 ===== */
+        body.dark-theme {
+            background: linear-gradient(135deg, #1a1d28 0%, #1e2130 30%, #252830 60%, #1c1f2a 100%);
+        }
+        body.dark-theme .bg-circle {
+            opacity: 0.04;
+        }
+        body.dark-theme .header-section h1,
+        body.dark-theme .header-section .subtitle,
+        body.dark-theme .card-label,
+        body.dark-theme .card-value,
+        body.dark-theme .weather-section h2,
+        body.dark-theme .weather-desc,
+        body.dark-theme .weather-temp {
+            color: #e0e0e0;
+        }
+        body.dark-theme .card,
+        body.dark-theme .weather-section {
+            background: #252830;
+            border-color: rgba(255,255,255,0.06);
+        }
+        body.dark-theme .weather-tip {
+            color: #999;
+        }
+        body.dark-theme .bottom-nav {
+            background: rgba(30, 33, 48, 0.92);
+            border-top-color: rgba(255,255,255,0.06);
+        }
+        body.dark-theme .nav-tab {
+            color: #888;
+        }
+        body.dark-theme .nav-tab.active {
+            color: #7cb8e4;
+            background: rgba(91, 155, 213, 0.12);
+        }
+        body.dark-theme .nav-tab:active {
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* 天气区域 */
+        .weather-section {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 28px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0,0,0,0.04);
+            text-align: center;
+        }
+
+        .weather-section h2 {
+            color: #000;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .weather-emoji {
+            font-size: 4em;
+            animation: weather-float 3s ease-in-out infinite;
+            line-height: 1;
+        }
+
+        @keyframes weather-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .weather-desc {
+            font-size: 1.2em;
+            color: #333;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .weather-temp {
+            font-size: 2.6em;
+            font-weight: bold;
+            color: #000;
+            margin-top: 4px;
+        }
+
+        .weather-tip {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主题切换开关 -->
+    <div class="theme-switch-wrapper">
+        <label class="switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="bg-decoration">
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+        <div class="bg-circle bg-circle-3"></div>
+    </div>
+
+    <div class="main-container">
+        <div class="header-section">
+            <h1>数据统计</h1>
+            <div class="subtitle">GuɑnXin Youth Group Two</div>
+        </div>
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-label">上周挣到的钱</div>
+                <div class="card-value" id="last-week-money">加载中...</div>
+            </div>
+
+            <div class="weather-section">
+                <h2>🌤️ 今日天气</h2>
+                <div class="weather-emoji" id="weather-emoji">⏳</div>
+                <div class="weather-desc" id="weather-desc">获取中...</div>
+                <div class="weather-temp" id="weather-temp"></div>
+                <div class="weather-tip" id="weather-tip"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a class="nav-tab" href="../index.html">
+            <span class="nav-icon">📊</span>
+            <span>仪表盘</span>
+        </a>
+        <a class="nav-tab" href="../finance/index.html">
+            <span class="nav-icon">💰</span>
+            <span>财政</span>
+        </a>
+        <div class="nav-tab active">
+            <span class="nav-icon">📈</span>
+            <span>数据统计</span>
+        </div>
+    </div>
+<script>
+    // 从 data/text.json 获取数据
+    fetch('https://group-two.tzlj.cc/data/text.json')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('last-week-money').textContent = data['上周挣到的钱'] + ' 元';
+        })
+        .catch(error => {
+            console.error('加载数据失败:', error);
+            document.getElementById('last-week-money').textContent = '加载失败';
+        });
+
+    // 获取天气 - 使用浏览器定位 + Open-Meteo API
+    function getWeatherEmoji(code) {
+        if (code === 0) return '☀️';
+        if (code <= 3) return '⛅';
+        if (code <= 48) return '🌫️';
+        if (code <= 55) return '🌦️';
+        if (code <= 65) return '🌧️';
+        if (code <= 75) return '🌨️';
+        if (code <= 82) return '🌧️';
+        return '⛈️';
+    }
+
+    function getWeatherDesc(code) {
+        if (code === 0) return '晴朗';
+        if (code <= 3) return '多云';
+        if (code <= 48) return '有雾';
+        if (code <= 55) return '毛毛雨';
+        if (code <= 65) return '下雨';
+        if (code <= 75) return '下雪';
+        if (code <= 82) return '阵雨';
+        return '雷暴';
+    }
+
+    function getWeatherTip(code) {
+        if (code === 0) return '阳光明媚，适合出门活动！';
+        if (code <= 3) return '云淡风轻，心情不错~';
+        if (code <= 48) return '雾蒙蒙的，注意安全哦~';
+        if (code <= 55) return '小雨绵绵，记得带伞~';
+        if (code <= 65) return '雨声淅沥，适合室内学习~';
+        if (code <= 75) return '雪花飘飘，注意保暖！';
+        if (code <= 82) return '阵雨来袭，带好雨具！';
+        return '雷暴天气，尽量待在室内！';
+    }
+
+    function fetchWeather(lat, lon) {
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+            .then(response => response.json())
+            .then(data => {
+                const weather = data.current_weather;
+                const code = weather.weathercode;
+                document.getElementById('weather-emoji').textContent = getWeatherEmoji(code);
+                document.getElementById('weather-desc').textContent = getWeatherDesc(code);
+                document.getElementById('weather-temp').textContent = weather.temperature + '°C';
+                document.getElementById('weather-tip').textContent = getWeatherTip(code);
+            })
+            .catch(error => {
+                console.error('获取天气失败:', error);
+                document.getElementById('weather-emoji').textContent = '🌈';
+                document.getElementById('weather-desc').textContent = '天气未知';
+                document.getElementById('weather-temp').textContent = '';
+                document.getElementById('weather-tip').textContent = '无法获取天气信息';
+            });
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+            () => fetchWeather(39.9, 116.4)
+        );
+    } else {
+        fetchWeather(39.9, 116.4);
+    }
+
+    // 主题切换
+    (function() {
+        var toggle = document.getElementById('theme-toggle');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+            if (toggle) toggle.checked = true;
+        }
+        if (toggle) {
+            toggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('dark-theme');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+    })();
+
+</script>
+</body>
+</html>
