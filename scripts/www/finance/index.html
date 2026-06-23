@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>观心少年2组 - 财政</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f0f8 0%, #dfe9f3 30%, #eef3f9 60%, #e3ecf5 100%);
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 80px;
+        }
+
+        /* 背景装饰 */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.08;
+        }
+
+        .bg-circle-1 {
+            width: 280px; height: 280px;
+            background: #4a90d9;
+            top: -80px;
+            right: -70px;
+        }
+
+        .bg-circle-2 {
+            width: 180px; height: 180px;
+            background: #5b9bd5;
+            bottom: 130px;
+            left: -50px;
+        }
+
+        .bg-circle-3 {
+            width: 150px;
+            height: 150px;
+            background: #3a7bc8;
+            top: 40%;
+            right: -40px;
+        }
+
+        /* 主容器 */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            padding: 20px 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 标题 */
+        .header-section {
+            text-align: center;
+            padding: 20px 0 10px;
+        }
+
+        .header-section h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #000;
+            letter-spacing: 4px;
+            margin: 0;
+        }
+
+        .header-section .subtitle {
+            font-size: 0.85em;
+            color: #999;
+            letter-spacing: 2px;
+            margin-top: 6px;
+        }
+
+        /* 卡片 */
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 28px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.04);
+            margin-bottom: 16px;
+        }
+
+        .card h2 {
+            font-size: 1.1em;
+            color: #888;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            font-weight: normal;
+        }
+
+        /* 目标数字 */
+        .target-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .target-number {
+            font-size: 2.6em;
+            font-weight: bold;
+            color: #000;
+            letter-spacing: 4px;
+        }
+
+        .target-unit {
+            font-size: 1em;
+            color: #888;
+            margin-left: 4px;
+        }
+
+        /* 数字滚轮 */
+        .money-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .digit-container {
+            position: relative;
+            width: 44px;
+            height: 64px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #2d3436 0%, #636e72 100%);
+            border-radius: 8px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .digit-roller {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .digit-item {
+            width: 44px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .money-unit {
+            font-size: 1em;
+            font-weight: bold;
+            color: #000;
+            margin-left: 6px;
+        }
+
+        /* 图片区域 */
+        .image-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 24px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .image-card h2 {
+            font-size: 1.1em;
+            color: #888;
+            margin-bottom: 18px;
+            letter-spacing: 2px;
+            font-weight: normal;
+        }
+
+        .image-card img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0;
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+            z-index: 100;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 6px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #999;
+            font-size: 0.7em;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .nav-tab .nav-icon {
+            font-size: 1.4em;
+            line-height: 1;
+        }
+
+        .nav-tab.active {
+            color: #5b9bd5;
+            background: rgba(91, 155, 213, 0.08);
+        }
+
+        .nav-tab:active {
+            transform: scale(0.92);
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        @media (max-width: 360px) {
+            .header-section h1 { font-size: 1.5em; }
+            .digit-container { width: 38px; height: 56px; }
+            .digit-item { width: 38px; height: 56px; font-size: 1.8em; }
+            .target-number { font-size: 2.2em; }
+        }
+
+        @media (min-width: 420px) {
+            .digit-container { width: 50px; height: 72px; }
+            .digit-item { width: 50px; height: 72px; font-size: 2.6em; }
+        }
+
+        /* ===== 主题切换开关 ===== */
+        .theme-switch-wrapper {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+        }
+        .switch {
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            width: 3.2em;
+            height: 1.8em;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #f4f4f5;
+            transition: .4s;
+            border-radius: 30px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 1.3em;
+            width: 1.3em;
+            border-radius: 20px;
+            left: 0.25em;
+            bottom: 0.25em;
+            background: linear-gradient(40deg,#ff0080,#ff8c00 70%);
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: #303136;
+        }
+        input:checked + .slider:before {
+            transform: translateX(1.4em);
+            background: #303136;
+            box-shadow: inset -3px -2px 5px -2px #8983f7, inset -10px -5px 0 0 #a3dafb;
+        }
+
+        /* ===== 深色主题 ===== */
+        body.dark-theme {
+            background: linear-gradient(135deg, #1a1d28 0%, #1e2130 30%, #252830 60%, #1c1f2a 100%);
+        }
+        body.dark-theme .bg-circle {
+            opacity: 0.04;
+        }
+        body.dark-theme .header-section h1,
+        body.dark-theme .header-section .subtitle,
+        body.dark-theme .card h2,
+        body.dark-theme .target-number,
+        body.dark-theme .target-unit,
+        body.dark-theme .money-unit,
+        body.dark-theme .image-card h2 {
+            color: #e0e0e0;
+        }
+        body.dark-theme .card,
+        body.dark-theme .image-card {
+            background: #252830;
+            border-color: rgba(255,255,255,0.06);
+        }
+        body.dark-theme .bottom-nav {
+            background: rgba(30, 33, 48, 0.92);
+            border-top-color: rgba(255,255,255,0.06);
+        }
+        body.dark-theme .nav-tab {
+            color: #888;
+        }
+        body.dark-theme .nav-tab.active {
+            color: #7cb8e4;
+            background: rgba(91, 155, 213, 0.12);
+        }
+        body.dark-theme .nav-tab:active {
+            background: rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- 主题切换开关 -->
+    <div class="theme-switch-wrapper">
+        <label class="switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="bg-decoration">
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+        <div class="bg-circle bg-circle-3"></div>
+    </div>
+
+    <div class="main-container">
+        <div class="header-section">
+            <h1>财政</h1>
+            <div class="subtitle">GuɑnXin Youth Group Two</div>
+        </div>
+
+        <!-- 本周目标 -->
+        <div class="card">
+            <h2>🎯 本周目标</h2>
+            <div class="target-display">
+                <span class="target-number">5000</span>
+                <span class="target-unit">元</span>
+            </div>
+        </div>
+
+        <!-- 挣到的钱 - 数字滚轮 -->
+        <div class="card">
+            <h2>💰 挣到的钱</h2>
+            <div class="money-display" id="moneyDisplay">
+                <div class="digit-container" id="dc-0"><div class="digit-roller" id="roller-0"><div class="digit-item">0</div></div></div>
+                <div class="digit-container" id="dc-1"><div class="digit-roller" id="roller-1"><div class="digit-item">0</div></div></div>
+                <div class="digit-container" id="dc-2"><div class="digit-roller" id="roller-2"><div class="digit-item">0</div></div></div>
+                <div class="digit-container" id="dc-3"><div class="digit-roller" id="roller-3"><div class="digit-item">0</div></div></div>
+                <div class="digit-container" id="dc-4"><div class="digit-roller" id="roller-4"><div class="digit-item">0</div></div></div>
+                <span class="money-unit">元</span>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a class="nav-tab" href="../index.html">
+            <span class="nav-icon">📊</span>
+            <span>仪表盘</span>
+        </a>
+        <div class="nav-tab active">
+            <span class="nav-icon">💰</span>
+            <span>财政</span>
+        </div>
+        <a class="nav-tab" href="../data-stats/index.html">
+            <span class="nav-icon">📈</span>
+            <span>数据统计</span>
+        </a>
+    </div>
+
+    <script>
+        function rollDigit(rollerEl, targetDigit, delay) {
+            setTimeout(() => {
+                rollerEl.innerHTML = '';
+                const totalRolls = 20 + targetDigit;
+                for (let i = 0; i <= totalRolls; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'digit-item';
+                    div.textContent = i % 10;
+                    rollerEl.appendChild(div);
+                }
+                const itemH = rollerEl.querySelector('.digit-item').offsetHeight || 64;
+                rollerEl.style.transform = 'translateY(0px)';
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        rollerEl.style.transition = 'transform 2.2s cubic-bezier(0.1, 0.6, 0.2, 1)';
+                        rollerEl.style.transform = 'translateY(-' + (totalRolls * itemH) + 'px)';
+                    });
+                });
+            }, delay);
+        }
+
+        fetch('https://group-two.tzlj.cc/data/text.json')
+            .then(response => response.json())
+            .then(data => {
+                const money = data['挣到的钱'];
+                const digits = String(money).padStart(5, '0').split('').map(Number);
+                digits.forEach((d, i) => {
+                    rollDigit(document.getElementById('roller-' + i), d, i * 250);
+                });
+            })
+            .catch(error => {
+                console.error('加载数据失败:', error);
+            });
+
+        // 主题切换
+        (function() {
+            var toggle = document.getElementById('theme-toggle');
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-theme');
+                if (toggle) toggle.checked = true;
+            }
+            if (toggle) {
+                toggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        document.body.classList.add('dark-theme');
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        document.body.classList.remove('dark-theme');
+                        localStorage.setItem('theme', 'light');
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
